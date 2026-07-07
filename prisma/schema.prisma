@@ -1,0 +1,145 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  CITIZEN
+  ADMIN
+  OFFICER
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ComplaintStatus {
+  SUBMITTED
+  VERIFIED
+  ASSIGNED
+  IN_PROGRESS
+  RESOLVED
+}
+
+model User {
+  id             String         @id @default(uuid())
+  email          String         @unique
+  phone          String?        @unique
+  fullName       String
+  avatarUrl      String?
+  role           Role           @default(CITIZEN)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  profile        Profile?
+  complaints     Complaint[]
+  documents      UserDocument[]
+  chatSessions   ChatSession[]
+  notifications  Notification[]
+}
+
+model Profile {
+  id              String   @id @default(uuid())
+  userId          String   @unique
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  age             Int?
+  gender          String?
+  income          Float?
+  occupation      String?
+  education       String?
+  state           String?
+  district        String?
+  category        String?
+  isStudent       Boolean  @default(false)
+  isFarmer        Boolean  @default(false)
+  isBusiness      Boolean  @default(false)
+  isSeniorCitizen Boolean  @default(false)
+  isDisabled      Boolean  @default(false)
+}
+
+model UserDocument {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String   // Aadhaar, PAN, Passport, etc.
+  type        String   // PDF, IMAGE
+  fileUrl     String
+  ocrText     String?
+  isValid     Boolean  @default(true)
+  metadata    Json?    // Verification checks like expiry date, signature check, details
+  createdAt   DateTime @default(now())
+}
+
+model Complaint {
+  id          String          @id @default(uuid())
+  userId      String
+  user        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  category    String
+  department  String
+  priority    Priority        @default(MEDIUM)
+  status      ComplaintStatus @default(SUBMITTED)
+  imageUrl    String?
+  latitude    Float?
+  longitude   Float?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  timeline    ComplaintTimeline[]
+}
+
+model ComplaintTimeline {
+  id          String          @id @default(uuid())
+  complaintId String
+  complaint   Complaint       @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  status      ComplaintStatus
+  notes       String?
+  updatedAt   DateTime        @default(now())
+}
+
+model ChatSession {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  createdAt DateTime  @default(now())
+  messages  ChatMessage[]
+}
+
+model ChatMessage {
+  id        String      @id @default(uuid())
+  sessionId String
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  sender    String      // "user" or "assistant"
+  text      String
+  mediaUrl  String?
+  mediaType String?     // image, pdf
+  createdAt DateTime    @default(now())
+}
+
+model Scheme {
+  id             String   @id @default(uuid())
+  name           String   @unique
+  description    String
+  benefits       String
+  eligibility    Json     // Detailed eligibility parameters
+  docsRequired   String[]
+  officialLink   String
+  category       String
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
