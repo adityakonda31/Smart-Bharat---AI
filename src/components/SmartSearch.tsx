@@ -13,18 +13,20 @@ export const SmartSearch: React.FC<SmartSearchProps> = ({ isOpen, onClose, onNav
   const [query, setQuery] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Monitor shortcut Cmd+K / Ctrl+K
+  // Monitor shortcut Cmd+K / Ctrl+K and Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
-        if (isOpen) onClose();
-        else onClose(); // toggle is handled in parent
+        onClose();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, onClose]);
+  }, [onClose]);
 
   useEffect(() => {
     if (isOpen && inputRef.current) {
@@ -53,10 +55,16 @@ export const SmartSearch: React.FC<SmartSearchProps> = ({ isOpen, onClose, onNav
     : items;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4 bg-black/70 backdrop-blur-md">
+    <div 
+      className="fixed inset-0 z-50 flex items-start justify-center pt-24 px-4 bg-black/70 backdrop-blur-md"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Smart search directory overlay"
+    >
       <div 
         className="fixed inset-0 -z-10" 
         onClick={onClose}
+        aria-hidden="true"
       />
       
       <div className="w-full max-w-xl rounded-2xl glass-panel border border-white/[0.12] overflow-hidden shadow-2xl flex flex-col animate-in fade-in zoom-in duration-200">
@@ -71,9 +79,14 @@ export const SmartSearch: React.FC<SmartSearchProps> = ({ isOpen, onClose, onNav
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="flex-1 bg-transparent border-0 outline-none text-white text-base placeholder-slate-400 focus:ring-0"
+            aria-label="Search inputs query field"
           />
           {query && (
-            <button onClick={() => setQuery("")} className="p-1 rounded-md hover:bg-white/10 text-slate-400">
+            <button 
+              onClick={() => setQuery("")} 
+              className="p-1 rounded-md hover:bg-white/10 text-slate-400 focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none"
+              aria-label="Clear query text"
+            >
               <X size={16} />
             </button>
           )}
@@ -98,7 +111,8 @@ export const SmartSearch: React.FC<SmartSearchProps> = ({ isOpen, onClose, onNav
                       onNavigateTab(item.category);
                       onClose();
                     }}
-                    className="w-full flex items-start text-left space-x-3 p-3 rounded-xl hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all group"
+                    className="w-full flex items-start text-left space-x-3 p-3 rounded-xl hover:bg-white/[0.05] border border-transparent hover:border-white/[0.06] transition-all group focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                    aria-label={`Open page link: ${item.title}`}
                   >
                     <div className="p-2 rounded-lg bg-white/[0.04] text-secondary group-hover:bg-primary/20 group-hover:text-white transition-colors">
                       <Icon size={16} />
@@ -133,7 +147,8 @@ export const SmartSearch: React.FC<SmartSearchProps> = ({ isOpen, onClose, onNav
                   onNavigateTab("ai-chat");
                   onClose();
                 }}
-                className="mt-3 text-xs text-secondary hover:underline"
+                className="mt-3 text-xs text-secondary hover:underline focus-visible:ring-1 focus-visible:ring-primary focus-visible:outline-none"
+                aria-label="Ask Smart Bharat AI assistant instead"
               >
                 Ask Smart Bharat AI Assistant instead &rarr;
               </button>
@@ -143,7 +158,7 @@ export const SmartSearch: React.FC<SmartSearchProps> = ({ isOpen, onClose, onNav
 
         {/* Footer info */}
         <div className="px-4 py-2 border-t border-white/[0.08] bg-white/[0.01] flex items-center justify-between text-[10px] text-slate-500">
-          <span>Use &uarr;&darr; keys to navigate</span>
+          <span>Use shortcuts or escape key to close</span>
           <span>Press Enter to select</span>
         </div>
 

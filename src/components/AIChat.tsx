@@ -144,7 +144,12 @@ export const AIChat: React.FC = () => {
       </div>
 
       {/* Messages body stream */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/30">
+      <div 
+        className="flex-1 overflow-y-auto p-6 space-y-4 bg-slate-50/30"
+        role="log"
+        aria-live="polite"
+        aria-label="Chat message history log"
+      >
         {messages.map((msg, idx) => {
           const isUser = msg.sender === "user";
           return (
@@ -187,7 +192,7 @@ export const AIChat: React.FC = () => {
 
         {/* Loading shimmer indicator */}
         {loading && (
-          <div className="flex items-start space-x-3.5 max-w-[60%]">
+          <div className="flex items-start space-x-3.5 max-w-[60%]" aria-label="AI is composing response">
             <div className="h-8 w-8 rounded-lg bg-accent/10 border border-accent/20 text-accent flex items-center justify-center shrink-0">
               <Sparkles size={14} className="animate-spin" />
             </div>
@@ -203,7 +208,11 @@ export const AIChat: React.FC = () => {
 
       {/* Voice wave HUD when listening */}
       {isListening && (
-        <div className="px-6 py-2 bg-accent/5 border-t border-accent/10 flex items-center justify-between animate-pulse">
+        <div 
+          className="px-6 py-2 bg-accent/5 border-t border-accent/10 flex items-center justify-between animate-pulse"
+          role="status"
+          aria-live="assertive"
+        >
           <div className="flex items-center space-x-3">
             <Mic className="text-accent animate-bounce" size={16} />
             <span className="text-xs text-slate-600 font-poppins">{translateDynamic("Listening... speak your request")}</span>
@@ -229,7 +238,8 @@ export const AIChat: React.FC = () => {
               <button
                 key={idx}
                 onClick={() => handleSend(sug)}
-                className="text-[11px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 py-1.5 px-3 rounded-lg transition-all shadow-sm"
+                className="text-[11px] bg-white border border-slate-200 hover:bg-slate-50 text-slate-600 py-1.5 px-3 rounded-lg transition-all shadow-sm focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+                aria-label={`Ask suggested query: ${sug}`}
               >
                 {translateDynamic(sug)}
               </button>
@@ -248,7 +258,11 @@ export const AIChat: React.FC = () => {
               <Upload size={14} className="text-secondary" />
               <span className="truncate">{attachment.name}</span>
             </div>
-            <button onClick={() => setAttachment(null)} className="text-danger hover:underline text-[10px]">
+            <button 
+              onClick={() => setAttachment(null)} 
+              className="text-danger hover:underline text-[10px]"
+              aria-label="Remove attached file"
+            >
               Remove
             </button>
           </div>
@@ -260,15 +274,17 @@ export const AIChat: React.FC = () => {
           <div className="flex space-x-1.5">
             <button
               onClick={() => setAttachment({ name: "income_statement.pdf", type: "pdf" })}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
               title="Attach Document (PDF)"
+              aria-label="Attach mock income statement PDF"
             >
               <FileText size={16} />
             </button>
             <button
               onClick={() => setAttachment({ name: "damaged_road.png", type: "image" })}
-              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+              className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
               title="Attach Photo"
+              aria-label="Attach mock photo of damaged road"
             >
               <Image size={16} />
             </button>
@@ -283,18 +299,20 @@ export const AIChat: React.FC = () => {
               if (e.key === "Enter") handleSend(inputText);
             }}
             className="flex-1 bg-transparent border-none outline-none text-xs text-slate-800 placeholder-slate-400 focus:ring-0"
+            aria-label="AI chatbot message text query input"
           />
 
           {/* Voice trigger */}
           <button
             onClick={isListening ? stopListening : startListening}
             className={`
-              p-2 rounded-lg transition-colors
+              p-2 rounded-lg transition-colors focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none
               ${isListening 
                 ? "bg-danger text-white animate-pulse" 
                 : "text-slate-400 hover:text-slate-700 hover:bg-slate-100"}
             `}
             title={isListening ? "Stop listening" : "Start speaking"}
+            aria-label={isListening ? "Stop microphone recording" : "Record voice query"}
           >
             {isListening ? <MicOff size={16} /> : <Mic size={16} />}
           </button>
@@ -303,7 +321,8 @@ export const AIChat: React.FC = () => {
           <button
             onClick={() => handleSend(inputText)}
             disabled={!inputText.trim() && !attachment}
-            className="p-2 rounded-lg bg-primary hover:bg-primary/95 text-white disabled:opacity-50 disabled:hover:bg-primary transition-all shadow-md shadow-primary/10"
+            className="p-2 rounded-lg bg-primary hover:bg-primary/95 text-white disabled:opacity-50 disabled:hover:bg-primary transition-all shadow-md shadow-primary/10 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            aria-label="Send query to AI"
           >
             <Send size={14} />
           </button>

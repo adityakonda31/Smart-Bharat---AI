@@ -55,13 +55,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      <aside className={`
-        fixed md:sticky top-0 left-0 z-50
-        h-screen w-72 flex flex-col
-        glass-panel border-r border-slate-200/60
-        transition-transform duration-300 ease-in-out
-        ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
-      `}>
+      <aside 
+        className={`
+          fixed md:sticky top-0 left-0 z-50
+          h-screen w-72 flex flex-col
+          glass-panel border-r border-slate-200/60
+          transition-transform duration-300 ease-in-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+        `}
+        aria-label="Smart Bharat Portal Navigation Sidebar"
+      >
         {/* Header Logo */}
         <div className="p-6 border-b border-slate-200/50 flex items-center justify-between">
           <div className="flex items-center space-x-3">
@@ -80,6 +83,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <button 
             onClick={() => setIsOpen(false)}
             className="md:hidden p-1.5 rounded-lg hover:bg-slate-100 text-slate-500"
+            aria-label="Close sidebar panel"
           >
             <X size={18} />
           </button>
@@ -92,7 +96,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               setSearchOpen(true);
               setIsOpen(false);
             }}
-            className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200/60 hover:bg-slate-100 hover:border-slate-300 transition-all text-left text-slate-500 text-xs"
+            className="w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl bg-slate-50 border border-slate-200/60 hover:bg-slate-100 hover:border-slate-300 transition-all text-left text-slate-500 text-xs focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none"
+            aria-label="Open global directory search (Cmd+K)"
           >
             <Search size={16} />
             <span>Search... (Cmd+K)</span>
@@ -100,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         {/* Navigation Items */}
-        <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1.5">
+        <nav className="flex-1 overflow-y-auto px-4 py-4 space-y-1.5" aria-label="Portal section navigation">
           {menuItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentTab === item.id;
@@ -114,18 +119,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 }}
                 className={`
                   w-full flex items-center justify-between px-4 py-3 rounded-xl
-                  font-poppins text-xs transition-all duration-200
+                  font-poppins text-xs transition-all duration-200 focus-visible:ring-2 focus-visible:ring-primary focus-visible:outline-none
                   ${isActive 
                     ? item.danger 
                       ? "bg-danger/10 text-danger border border-danger/20 shadow-sm shadow-danger/5 font-semibold" 
                       : "bg-primary/8 text-primary border border-primary/20 shadow-sm shadow-primary/5 font-semibold" 
                     : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 border border-transparent"}
                 `}
+                aria-current={isActive ? "page" : undefined}
+                aria-label={`Go to ${item.label} section`}
               >
                 <div className="flex items-center space-x-3.5">
                   <Icon size={18} className={
                     isActive 
-                      ? item.danger ? "text-danger" : "text-primary animate-pulse" 
+                      ? item.danger ? "text-danger" : "text-primary" 
                       : item.glow ? "text-accent animate-pulse" : "text-slate-500"
                   } />
                   <span>{item.label}</span>
@@ -149,6 +156,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               value={currentLanguage}
               onChange={(e) => setLanguage(e.target.value as any)}
               className="bg-white text-slate-800 border border-slate-200 rounded-lg px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary/45"
+              aria-label="Select website language"
             >
               {languages.map((lang) => (
                 <option key={lang.code} value={lang.code}>
@@ -179,7 +187,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               
               <button 
                 onClick={logout}
-                className="p-1.5 rounded-lg hover:bg-danger/10 text-slate-500 hover:text-danger transition-colors"
+                className="p-1.5 rounded-lg hover:bg-danger/10 text-slate-500 hover:text-danger transition-colors focus-visible:ring-2 focus-visible:ring-danger focus-visible:outline-none"
+                aria-label="Log out of application"
                 title="Log Out"
               >
                 <LogOut size={16} />
